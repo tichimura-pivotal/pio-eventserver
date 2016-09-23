@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Fail immediately on non-zero exit code.
+set -e
+
+if [ "$PIO_TRAIN_ON_RELEASE" != "false" ]; then /app/bin/heroku-buildpack-pio-train; fi
