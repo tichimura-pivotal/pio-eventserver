@@ -29,6 +29,7 @@ The limited resources of a single dyno restrict use of typically large, statisti
 * [Training](#training)
   * [Automatic training](#automatic-training)
   * [Manual training](#manual-training)
+* [Scale-up](#scale-up)
 * [Evaluation](#evaluation)
   1. [Changes required for evaluation](#changes-required-for-evaluation)
   1. [Perform evaluation](#perform-evaluation)
@@ -130,7 +131,9 @@ Modify this file to make sure the `appName` parameter matches the app record [cr
 This step will vary based on the engine. Typically, a command formatted like the following, should be run locally:
 
 ```bash
-python ./data/import_eventserver.py --url https://$eventserver_name.herokuapp.com --access_key $pio_app_access_key
+python ./data/import_eventserver.py \
+  --url https://$eventserver_name.herokuapp.com \
+  --access_key $pio_app_access_key
 ```
 
 * check the engine's `data/` directory for exact naming & format.
@@ -164,7 +167,10 @@ heroku restart
 Once deployed, scale up the processes to avoid memory issues:
 
 ```bash
-heroku ps:scale web=1:Performance-M release=0:Performance-L train=0:Performance-L
+heroku ps:scale \
+  web=1:Performance-M \
+  release=0:Performance-L \
+  train=0:Performance-L
 ```
 
 ## Evaluation
@@ -198,7 +204,8 @@ Then, start the process, specifying the evaluation & engine params classes from 
 $ pio eval \
     org.template.classification.AccuracyEvaluation \
     org.template.classification.EngineParamsList  \
-    -- --driver-class-path /app/lib/postgresql_jdbc.jar
+    -- --driver-class-path /app/lib/postgresql_jdbc.jar \
+      --executor-memory 10g
 ```
 
 ### Re-deploy best parameters
@@ -233,8 +240,8 @@ Engine deployments honor the following config vars:
 
     ```bash
     heroku config:set \
-      PIO_SPARK_OPTS='--total-executor-cores 2 --executor-memory 1g' \
-      PIO_TRAIN_SPARK_OPTS='--total-executor-cores 8 --executor-memory 4g'
+      PIO_SPARK_OPTS='--executor-memory 1g' \
+      PIO_TRAIN_SPARK_OPTS='--executor-memory 10g'
     ```
 * `PIO_EVENTSERVER_HOSTNAME`
   * `$eventserver_name.herokuapp.com`
