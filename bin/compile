@@ -104,7 +104,7 @@ then
   # Move to dyno-compatible prefix for `pio build`
   mv $BUILD_DIR/* $app_prefix
   cd $app_prefix
-  $dist_name/bin/pio build | indent
+  $dist_name/bin/pio build --verbose | indent
 
   topic "Clean-up build artifacts"
   # Try to keep slug below 300MB limit.
