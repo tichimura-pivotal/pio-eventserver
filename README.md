@@ -1,60 +1,70 @@
-# Heroku buildpack for PredictionIO
+# PredictionIO classification app
 
-[PredictionIO](http://predictionio.incubator.apache.org) is an open source machine learning framework. 
+Predictive classification powered by [PredictionIO](https://predictionio.incubator.apache.org), machine learning on [Heroku](http://www.heroku.com).
 
-Two apps are composed to make a basic PredictionIO service:
+This is a demo application of PredictionIO, already customized for a smoothest experience possible. **Custom PredictionIO engines** may be deployed as well, see [CUSTOM documentation](CUSTOM.md).
 
-1. **Engine**: a specialized machine learning app which provides training of a model and then queries against that model; generated from a [template](https://predictionio.incubator.apache.org/gallery/template-gallery/) or [custom code](https://predictionio.incubator.apache.org/customize/).
-2. **Eventserver**: a simple HTTP API app for capturing events to process from other systems; shareable between multiple engines.
+## How To 📚
 
-This buildpack will deploy both of these apps: Engine when `engine.json` is present and otherwise Eventserver.
+✏️ Throughout this document, code terms that start with `$` represent a value (shell variable) that should be replaced with a customized value, e.g `$eventserver_name`, `$engine_name`, `$postgres_addon_id`…
 
-The limited resources of a single dyno restrict use of typically large, statistically significant datasets. Only **Performance-L** dynos with 14GB RAM (currently $16/day) provide reasonable utility in this configuration.
+### Deploy to Heroku
 
-## Docs 📚
+Please follow steps in order.
 
-✏️ Throughout these docs, code terms that start with `$` represent a value (shell variable) that should be replaced with a customized value, e.g `$eventserver_name`, `$engine_name`, `$postgres_addon_id`…
-
-* [Eventserver](#eventserver)
+1. [Requirements](#1-requirements)
+1. [Eventserver](#2-eventserver)
   1. [Create the eventserver](#create-the-eventserver)
   1. [Deploy the eventserver](#deploy-the-eventserver)
-* [Engine](#engine)
-  1. [Create an engine](#create-an-engine)
-  1. [Create a Heroku app for the engine](#create-a-heroku-app-for-the-engine)
-  1. [Create a PredictionIO app in the eventserver](#create-a-predictionio-app-in-the-eventserver)
-  1. [Configure the Heroku app to use the eventserver](#configure-the-heroku-app-to-use-the-eventserver)
-  1. [Update `engine.json`](#update-engine-json)
+1. [Classification engine](#3-classification-engine)
+  1. [Create the engine](#create-an-engine)
+  1. [Connect the engine with the eventserver](#connect-the-engine-with-the-eventserver)
   1. [Import data](#import-data)
-  1. [Deploy to Heroku](#deploy-to-heroku)
+  1. [Deploy the engine](#deploy-the-engine)
+
+### Usage
+
+Once deployed, how to work with the engine.
+
 * [Training](#training)
   * [Automatic training](#automatic-training)
   * [Manual training](#manual-training)
 * [Scale-up](#scale-up)
-* [Evaluation](#evaluation)
-  1. [Changes required for evaluation](#changes-required-for-evaluation)
-  1. [Perform evaluation](#perform-evaluation)
-  1. [Re-deploy best parameters](#re-deploy-best-parameters)
+* 🎯 [Query for predictions](#query-for-predictions)
+
+### Going deeper
+
 * [Configuration](#configuration)
   * [Environment variables](#environment-variables)
 * [Running commands](#running-commands)
 
 
-## Eventserver
+# Deploy to Heroku 🚀
+
+## 1. Requirements
+
+* [Heroku account](https://signup.heroku.com)
+* [Heroku CLI](https://toolbelt.heroku.com), command-line tools
+* [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
+## 2. Eventserver
 
 ### Create the eventserver
 
 ```bash
-git clone https://github.com/heroku/predictionio-buildpack.git pio-eventserver
-cd pio-eventserver
+git clone \
+  https://github.com/heroku/predictionio-buildpack.git \
+  pio-eventserver-classification
+
+cd pio-eventserver-classification
 
 heroku create $eventserver_name
 heroku addons:create heroku-postgresql:hobby-dev
-heroku buildpacks:add -i 1 https://github.com/heroku/predictionio-buildpack.git
-heroku buildpacks:add -i 2 heroku/scala
+heroku buildpacks:add -i 1 \
+  https://github.com/heroku/predictionio-buildpack.git
+heroku buildpacks:add -i 2 \
+  heroku/scala
 ```
-
-* Note the Postgres add-on identifier, e.g. `postgresql-aerodynamic-00000`; use it below in place of `$postgres_addon_id`
-* You may want to specify `heroku-postgresql:standard-0` instead, because the free `hobby-dev` database is limited to 10,000 records.
 
 ### Deploy the eventserver
 
@@ -65,70 +75,59 @@ heroku pg:wait && git push heroku master
 ```
 
 
-## Engine
+## 3. Classification Engine
 
-Select an engine from the [gallery](https://predictionio.incubator.apache.org/gallery/template-gallery/). Download a `.tar.gz` from Github and open/expand it on your local computer.
-
-🚨 Avoid engines that persist their model to the filesystem, which is incompatible with the [emphermeral filesystem](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem) of Heroku dynos. These engines must be modified to use Amazon S3 or the database for persistence. 
-
-### Create an engine
-
-`cd` into the engine's directory, and ensure it is a git repo:
+### Create the engine
 
 ```bash
-git init
-```
+git clone \
+  https://github.com/heroku/predictionio-engine-classification.git \
+  predictionio-engine-classification
 
-### Create a Heroku app for the engine
+cd predictionio-engine-classification
 
-```bash
 heroku create $engine_name
-heroku buildpacks:add -i 1 https://github.com/heroku/heroku-buildpack-jvm-common.git
-heroku buildpacks:add -i 2 https://github.com/heroku/predictionio-buildpack.git
+heroku buildpacks:add -i 1 \
+  https://github.com/heroku/heroku-buildpack-jvm-common.git
+heroku buildpacks:add -i 2 \
+  https://github.com/heroku/predictionio-buildpack.git
 ```
 
-### Create a PredictionIO app in the eventserver
+### Connect the engine with the eventserver
+
+First, collect a few configuration values.
+
+#### Get the eventserver's database add-on ID
 
 ```bash
-heroku run 'pio app new $pio_app_name' -a $eventserver_name
+heroku addons:info heroku-postgresql --app $eventserver_name
+
+# Use the returned Postgres add-on ID
+# to attach it to the engine.
+# Example: `postgresql-aerodynamic-00000`
+#
+heroku addons:attach $postgres_addon_id --app $engine_name
 ```
 
-* This returns an access key for the app; use it below in place of `$pio_app_access_key`.
-
-### Configure the Heroku app to use the eventserver
-
-Replace the Postgres ID & eventserver config values with those from above:
+#### Get an access key for this engine's data
 
 ```bash
-heroku addons:attach $postgres_addon_id
+heroku run 'pio app new classi' --app $eventserver_name
+
+# Use the returned access key for `$pio_app_access_key`
+#
 heroku config:set \
   PIO_EVENTSERVER_HOSTNAME=$eventserver_name.herokuapp.com \
   PIO_EVENTSERVER_PORT=80 \
   PIO_EVENTSERVER_ACCESS_KEY=$pio_app_access_key \
-  PIO_EVENTSERVER_APP_NAME=$pio_app_name
+  PIO_EVENTSERVER_APP_NAME=classi
 ```
-
-* See [environment variables](#environment-variables) for config details.
-
-### Update `engine.json`
-
-Modify this file to make sure the `appName` parameter matches the app record [created in the eventserver](#generate-an-app-record-on-the-eventserver).
-
-```json
-  "datasource": {
-    "params" : {
-      "appName": "$pio_app_name"
-    }
-  }
-```
-
-* If the `appName` param is missing, you may need to [upgrade the template](https://predictionio.incubator.apache.org/resources/upgrade/).
 
 ### Import data
 
 🚨 Mandatory: data is required for training to succeed and then to serve predictive queries.
 
-This step will vary based on the engine. Typically, a command formatted like the following, should be run locally:
+* `pip install predictionio` may be required for the import script to run; see [how-to install pip](https://pip.pypa.io/en/stable/installing/)
 
 ```bash
 python ./data/import_eventserver.py \
@@ -136,16 +135,14 @@ python ./data/import_eventserver.py \
   --access_key $pio_app_access_key
 ```
 
-* check the engine's `data/` directory for exact naming & format.
-* `pip install predictionio` may be required for the import script to run
-
-### Deploy to Heroku
+### Deploy the engine
 
 ```bash
-git add .
-git commit -m "Initial PIO engine"
 git push heroku master
 ```
+
+
+# Usage ⌨️
 
 ## Training
 
@@ -162,6 +159,7 @@ heroku run train
 heroku restart
 ```
 
+
 ## Scale up
 
 Once deployed, scale up the processes to avoid memory issues:
@@ -170,54 +168,33 @@ Once deployed, scale up the processes to avoid memory issues:
 heroku ps:scale \
   web=1:Performance-M \
   release=0:Performance-L \
-  train=0:Performance-L
+  train=0:Performance-L \
+  --app $engine_name
 ```
 
-## Evaluation
 
-PredictionIO provides an [Evaluation mode for engines](https://predictionio.incubator.apache.org/evaluation/), which uses cross-validation to help select optimum engine parameters.
+## Query for predictions
 
-⚠️ Only engines that contain `src/main/scala/Evaluation.scala` support Evaluation mode.
-
-### Changes required for evaluation
-
-To run evaluation on Heroku, ensure `src/main/scala/Evaluation.scala` references the engine's name through the environment. Check the source file to verify that `appName` is set to `sys.env("PIO_EVENTSERVER_APP_NAME")`. For example:
-
-```scala
-DataSourceParams(appName = sys.env("PIO_EVENTSERVER_APP_NAME"), evalK = Some(5))
-```
-
-♻️ If that change was made, then commit, deploy, & re-train before proceeding.
-
-### Perform evaluation
-
-Next, start a console & change to the engine's directory:
+Submit queries containing three attributes to get a prediction for what label they fit best, based on the training data:
 
 ```bash
-heroku run bash --size Performance-L
-$ cd pio-engine/
+curl -X POST https://$eventserver_name.herokuapp.com/queries.json \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d '{ "attr0":10, "attr1":26, "attr2":3 }'
+
+curl -X POST https://$eventserver_name.herokuapp.com/queries.json \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d '{ "attr0":58, "attr1":26, "attr2":3 }'
 ```
 
-Then, start the process, specifying the evaluation & engine params classes from the `Evaluation.scala` source file. For example:
+See [usage details for this classification engine](http://predictionio.incubator.apache.org/templates/classification/quickstart/#6.-use-the-engine) in the PredictionIO docs.
 
-```bash
-$ pio eval \
-    org.template.classification.AccuracyEvaluation \
-    org.template.classification.EngineParamsList  \
-    -- --driver-class-path /app/lib/postgresql_jdbc.jar \
-      --executor-memory 10g
-```
 
-### Re-deploy best parameters
+# Going Deeper 🔬
 
-Once `pio eval` completes, still in the Heroku console, copy the contents of `best.json`:
+This is a demo application of PredictionIO, already customized for a smoothest experience possible.
 
-```bash
-$ cat best.json
-```
-
-♻️ Paste into your local `engine.json`, commit, & deploy.
-
+**Custom PredictionIO engines** may be deployed with this buildpack. See [CUSTOM documentation](CUSTOM.md).
 
 ## Configuration
 
