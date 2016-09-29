@@ -17,7 +17,7 @@ Please follow steps in order.
   1. [Create the eventserver](#create-the-eventserver)
   1. [Deploy the eventserver](#deploy-the-eventserver)
 1. [Classification engine](#3-classification-engine)
-  1. [Create the engine](#create-an-engine)
+  1. [Create the engine](#create-the-engine)
   1. [Connect the engine with the eventserver](#connect-the-engine-with-the-eventserver)
   1. [Import data](#import-data)
   1. [Deploy the engine](#deploy-the-engine)
@@ -52,10 +52,8 @@ cd pio-eventserver-classification
 
 heroku create $eventserver_name
 heroku addons:create heroku-postgresql:hobby-dev
-heroku buildpacks:add -i 1 \
-  https://github.com/heroku/predictionio-buildpack.git
-heroku buildpacks:add -i 2 \
-  heroku/scala
+heroku buildpacks:add -i 1 https://github.com/heroku/predictionio-buildpack.git
+heroku buildpacks:add -i 2 heroku/scala
 ```
 
 ### Deploy the eventserver
@@ -79,10 +77,8 @@ git clone \
 cd predictionio-engine-classification
 
 heroku create $engine_name
-heroku buildpacks:add -i 1 \
-  https://github.com/heroku/heroku-buildpack-jvm-common.git
-heroku buildpacks:add -i 2 \
-  https://github.com/heroku/predictionio-buildpack.git
+heroku buildpacks:add -i 1 https://github.com/heroku/heroku-buildpack-jvm-common.git
+heroku buildpacks:add -i 2 https://github.com/heroku/predictionio-buildpack.git
 ```
 
 ### Connect the engine with the eventserver
