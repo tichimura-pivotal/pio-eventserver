@@ -2,7 +2,7 @@
 
 Predictive classification powered by [PredictionIO](https://predictionio.incubator.apache.org), machine learning on [Heroku](http://www.heroku.com).
 
-This is a demo application of PredictionIO, already customized for a smoothest experience possible. **Custom PredictionIO engines** may be deployed as well, see [CUSTOM documentation](CUSTOM.md).
+This is a demo application of PredictionIO version 0.9.5, already customized for the smoothest experience possible. **Custom PredictionIO engines** may be deployed as well, see [CUSTOM documentation](CUSTOM.md).
 
 ## How To 📚
 
@@ -28,6 +28,7 @@ Once deployed, how to work with the engine.
 
 * [Scale-up](#scale-up)
 * 🎯 [Query for predictions](#query-for-predictions)
+* [Diagnostics](#diagnostics)
 
 
 # Deploy to Heroku 🚀
@@ -146,7 +147,7 @@ Once deployed, scale up the processes to avoid memory issues:
 
 ```bash
 heroku ps:scale \
-  web=1:Performance-M \
+  web=1:Standard-2X \
   release=0:Performance-L \
   train=0:Performance-L \
   --app $engine_name
@@ -170,9 +171,26 @@ curl -X POST https://$engine_name.herokuapp.com/queries.json \
 See [usage details for this classification engine](http://predictionio.incubator.apache.org/templates/classification/quickstart/#6.-use-the-engine) in the PredictionIO docs.
 
 
+## Diagnostics
+
+If you hit any snags with the engine serving queries, check the logs:
+
+```bash
+heroku logs -t --app $engine_name
+```
+
+If errors are occuring, sometimes a restart will help:
+
+```bash
+heroku restart --app $engine_name
+```
+
+
 # Going Deeper 🔬
 
-This is a demo application of PredictionIO, already customized for a smoothest experience possible.
+This is a demo application of PredictionIO, already customized for the smoothest experience possible.
 
-**Custom PredictionIO engines** may be deployed with this buildpack. See [CUSTOM documentation](CUSTOM.md).
+**Custom PredictionIO engines** may be deployed with this buildpack too. See [CUSTOM documentation](CUSTOM.md).
+
+More details including [training](CUSTOM.md#training), [evaluation](CUSTOM.md#evaluation), & [configuration](CUSTOM.md#configuration) are explained there to.
 

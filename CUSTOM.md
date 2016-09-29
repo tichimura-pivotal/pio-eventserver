@@ -1,4 +1,4 @@
-# Heroku buildpack for [PredictionIO](http://predictionio.incubator.apache.org)
+# Heroku buildpack for [PredictionIO](http://predictionio.incubator.apache.org) 0.9.5
 
 👓 Requires intermediate technical skills working with PredictionIO engines.
 
@@ -74,6 +74,8 @@ heroku pg:wait && git push heroku master
 ## Engine
 
 Select an engine from the [gallery](https://predictionio.incubator.apache.org/gallery/template-gallery/). Download a `.tar.gz` from Github and open/expand it on your local computer.
+
+🏷 This buildpack is compatible with templates built for **PredictionIO version 0.9**
 
 🚨 Avoid engines that persist their model to the filesystem, which is incompatible with the [emphermeral filesystem](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem) of Heroku dynos. These engines must be modified to use Amazon S3 or the database for persistence. 
 
