@@ -172,11 +172,11 @@ heroku ps:scale \
 Submit queries containing three attributes to get a prediction for what label they fit best, based on the training data:
 
 ```bash
-curl -X POST https://$eventserver_name.herokuapp.com/queries.json \
+curl -X POST https://$engine_name.herokuapp.com/queries.json \
      -H 'Content-Type: application/json; charset=utf-8' \
      -d '{ "attr0":10, "attr1":26, "attr2":3 }'
 
-curl -X POST https://$eventserver_name.herokuapp.com/queries.json \
+curl -X POST https://$engine_name.herokuapp.com/queries.json \
      -H 'Content-Type: application/json; charset=utf-8' \
      -d '{ "attr0":58, "attr1":26, "attr2":3 }'
 ```
