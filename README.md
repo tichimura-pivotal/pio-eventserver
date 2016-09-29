@@ -26,9 +26,6 @@ Please follow steps in order.
 
 Once deployed, how to work with the engine.
 
-* [Training](#training)
-  * [Automatic training](#automatic-training)
-  * [Manual training](#manual-training)
 * [Scale-up](#scale-up)
 * 🎯 [Query for predictions](#query-for-predictions)
 
@@ -95,7 +92,7 @@ First, collect a few configuration values.
 
 ```bash
 heroku addons:info heroku-postgresql --app $eventserver_name
-
+#
 # Use the returned Postgres add-on ID
 # to attach it to the engine.
 # Example: `postgresql-aerodynamic-00000`
@@ -107,7 +104,7 @@ heroku addons:attach $postgres_addon_id --app $engine_name
 
 ```bash
 heroku run 'pio app new classi' --app $eventserver_name
-
+#
 # Use the returned access key for `$pio_app_access_key`
 #
 heroku config:set \
@@ -133,26 +130,15 @@ python ./data/import_eventserver.py \
 
 ```bash
 git push heroku master
+#
+# Follow the logs to see training 
+# and then start-up of the engine.
+#
+heroku logs -t --app $engine_name
 ```
 
 
 # Usage ⌨️
-
-## Training
-
-### Automatic training
-
-`pio train` will automatically run during [release-phase of the Heroku app](https://devcenter.heroku.com/articles/release-phase).
-
-### Manual training
-
-```bash
-heroku run train
-
-# You may need to revive the app from "crashed" state.
-heroku restart
-```
-
 
 ## Scale up
 
