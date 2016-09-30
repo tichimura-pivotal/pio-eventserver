@@ -152,17 +152,29 @@ heroku ps:scale \
 
 ## Query for predictions
 
-Submit queries containing three attributes to get a prediction for what label they fit best, based on the training data:
+When deployed, the model was auto-trained to predict the best fitting service plan for a mobile phone user based on their voice, data and text usage.
+
+Submit queries containing these three user properties to get a prediction for the best fitting service plan:
 
 ```bash
 curl -X POST https://$engine_name.herokuapp.com/queries.json \
      -H 'Content-Type: application/json; charset=utf-8' \
-     -d '{ "attr0":10, "attr1":26, "attr2":3 }'
+     -d '{ "voice_usage":10, "data_usage":26, "text_usage":30 }'
 
 curl -X POST https://$engine_name.herokuapp.com/queries.json \
      -H 'Content-Type: application/json; charset=utf-8' \
-     -d '{ "attr0":58, "attr1":26, "attr2":3 }'
+     -d '{ "voice_usage":58, "data_usage":26, "text_usage":300 }'
 ```
+
+This model is simplified for demonstration. For a real-world model, more aspects of a user account should be taken into consideration:
+
+  * account type: individual, business, or family
+  * how frequently do they roam
+  * do they roam internationally
+  * kind of device:  smart phone or feature phone
+  * age of device
+
+The training dataset is crucial to the  relevancy of predictions. Expirementation with your unique data is a must.
 
 See [usage details for this classification engine](http://predictionio.incubator.apache.org/templates/classification/quickstart/#6.-use-the-engine) in the PredictionIO docs.
 
