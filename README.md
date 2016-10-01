@@ -2,7 +2,9 @@
 
 Predictive classification powered by [PredictionIO](https://predictionio.incubator.apache.org), machine learning on [Heroku](http://www.heroku.com).
 
-This is a demo application of PredictionIO version 0.9.5, already customized for the smoothest experience possible. **Custom PredictionIO engines** may be deployed as well, see [CUSTOM documentation](CUSTOM.md).
+This is a demo application of PredictionIO version 0.9.5 preset for simplified deployment. **Custom PredictionIO engines** may be deployed as well, see [CUSTOM documentation](CUSTOM.md).
+
+Once deployed, this engine demonstrates prediction of the best fitting **service plan** for a **mobile phone user** based on their **voice, data, and text usage**. The model is trained with a small, example data set.
 
 ## How To 📚
 
@@ -67,6 +69,8 @@ heroku pg:wait && git push heroku master
 
 ## 3. Classification Engine
 
+We'll be using a [classification engine for Heroku](https://github.com/heroku/predictionio-engine-classification) which implements [Apache Spark MLlib's Naive Bayes algorithm](https://spark.apache.org/docs/1.6.2/mllib-naive-bayes.html) to predict a label from a set of attributes. See the [Classification Quickstart](http://predictionio.incubator.apache.org/templates/classification/quickstart/) for more about this engine.
+
 ### Create the engine
 
 ```bash
@@ -113,9 +117,11 @@ heroku config:set \
 
 ### Import data
 
-🚨 Mandatory: data is required for training to succeed and then to serve predictive queries.
+🚨 Mandatory: data is required for training. The model cannot answer predictive queries until trained with data.
 
-* `pip install predictionio` may be required for the import script to run; see [how-to install pip](https://pip.pypa.io/en/stable/installing/)
+When deployed, the engine will automatically train a model to predict the best fitting **service plan** for a **mobile phone user** based on their **voice, data, and text usage**. We'll use the engine's [example data and import script](https://github.com/heroku/predictionio-engine-classification/tree/master/data) for initial training.
+
+* `pip install predictionio` may be required before the import script will run; see [how-to install pip](https://pip.pypa.io/en/stable/installing/)
 
 ```bash
 python ./data/import_eventserver.py \
@@ -127,7 +133,7 @@ python ./data/import_eventserver.py \
 
 ```bash
 git push heroku master
-#
+
 # Follow the logs to see training 
 # and then start-up of the engine.
 #
@@ -152,9 +158,9 @@ heroku ps:scale \
 
 ## Query for predictions
 
-When deployed, the model was auto-trained to predict the best fitting service plan for a mobile phone user based on their voice, data and text usage.
+Once deployment completes, the engine is ready to predict the best fitting **service plan** for a **mobile phone user** based on their **voice, data, and text usage**.
 
-Submit queries containing these three user properties to get a prediction for the best fitting service plan:
+Submit queries containing these three user attributes to get predictions using [Apache Spark MLlib's Naive Bayes algorithm](https://spark.apache.org/docs/1.6.2/mllib-naive-bayes.html):
 
 ```bash
 curl -X POST https://$engine_name.herokuapp.com/queries.json \
@@ -166,15 +172,7 @@ curl -X POST https://$engine_name.herokuapp.com/queries.json \
      -d '{ "voice_usage":58, "data_usage":26, "text_usage":300 }'
 ```
 
-This model is simplified for demonstration. For a real-world model, more aspects of a user account should be taken into consideration:
-
-  * account type: individual, business, or family
-  * how frequently do they roam
-  * do they roam internationally
-  * kind of device:  smart phone or feature phone
-  * age of device
-
-The training dataset is crucial to the  relevancy of predictions. Expirementation with your unique data is a must.
+This model is simplified for demonstration. For a real-world model more aspects of a user account might be taken into consideration, including: account type (individual, business, or family), frequency of roaming, international usage, device type (smart phone or feature phone), age of device, etc.
 
 See [usage details for this classification engine](http://predictionio.incubator.apache.org/templates/classification/quickstart/#6.-use-the-engine) in the PredictionIO docs.
 
