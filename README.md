@@ -163,16 +163,23 @@ Once deployment completes, the engine is ready to predict the best fitting **ser
 Submit queries containing these three user attributes to get predictions using [Apache Spark MLlib's Naive Bayes algorithm](https://spark.apache.org/docs/1.6.2/mllib-naive-bayes.html):
 
 ```bash
-curl -X POST https://$engine_name.herokuapp.com/queries.json \
-     -H 'Content-Type: application/json; charset=utf-8' \
-     -d '{ "voice_usage":10, "data_usage":26, "text_usage":30 }'
+# Fits more voice, `1`
+curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
+     -H "Content-Type: application/json; charset=utf-8" \
+     -d "{\"voice_usage\":480,\"data_usage\":0,\"text_usage\":121}"
 
-curl -X POST https://$engine_name.herokuapp.com/queries.json \
-     -H 'Content-Type: application/json; charset=utf-8' \
-     -d '{ "voice_usage":58, "data_usage":26, "text_usage":300 }'
+# Fits more data, `2`
+curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
+     -H "Content-Type: application/json; charset=utf-8" \
+     -d "{\"voice_usage\":25,\"data_usage\":1000,\"text_usage\":80}"
+
+#Fits more texts, `3`
+curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
+     -H "Content-Type: application/json; charset=utf-8" \
+     -d "{\"voice_usage\":5,\"data_usage\":80,\"text_usage\":1000}"
 ```
 
-This model is simplified for demonstration. For a real-world model more aspects of a user account might be taken into consideration, including: account type (individual, business, or family), frequency of roaming, international usage, device type (smart phone or feature phone), age of device, etc.
+This model is simplified for demonstration. For a real-world model more aspects of a user account and their correlations might be taken into consideration, including: account type (individual, business, or family), frequency of roaming, international usage, device type (smart phone or feature phone), age of device, etc.
 
 See [usage details for this classification engine](http://predictionio.incubator.apache.org/templates/classification/quickstart/#6.-use-the-engine) in the PredictionIO docs.
 
