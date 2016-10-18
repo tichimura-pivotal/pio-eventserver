@@ -98,7 +98,7 @@ heroku buildpacks:add -i 2 https://github.com/heroku/predictionio-buildpack.git
 ### Create a PredictionIO app in the eventserver
 
 ```bash
-heroku run 'pio app new $pio_app_name' -a $eventserver_name
+heroku run "pio app new $pio_app_name" -a $eventserver_name
 ```
 
 * This returns an access key for the app; use it below in place of `$pio_app_access_key`.
