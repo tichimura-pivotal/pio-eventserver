@@ -11,7 +11,11 @@
 # Must match $spark_dist_dir in bin.compile
 SPARK_HOME=/app/pio-engine/PredictionIO-dist/vendors/spark-hadoop
 
-POSTGRES_JDBC_DRIVER=/app/lib/postgresql_jdbc.jar
+
+if [ -e "/app/.heroku/.is_old_predictionio" ]
+then
+  POSTGRES_JDBC_DRIVER=/app/lib/postgresql_jdbc.jar
+fi
 
 # ES_CONF_DIR: You must configure this if you have advanced configuration for
 #              your Elasticsearch setup.

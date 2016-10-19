@@ -2,7 +2,7 @@
 
 Predictive classification powered by [PredictionIO](https://predictionio.incubator.apache.org), machine learning on [Heroku](http://www.heroku.com).
 
-This is a demo application of PredictionIO version 0.9.5 preset for simplified deployment. **Custom PredictionIO engines** may be deployed as well, see [CUSTOM documentation](CUSTOM.md).
+This is a demo application of PredictionIO preset for simplified deployment. **Custom PredictionIO engines** may be deployed as well, see [CUSTOM documentation](CUSTOM.md).
 
 Once deployed, this engine demonstrates prediction of the best fitting **service plan** for a **mobile phone user** based on their **voice, data, and text usage**. The model is trained with a small, example data set.
 
@@ -145,7 +145,7 @@ heroku logs -t --app $engine_name
 
 ## Scale up
 
-Once deployed, scale up the processes to avoid memory issues:
+Once deployed, scale up the processes and config Spark to avoid memory issues:
 
 ```bash
 heroku ps:scale \
@@ -153,6 +153,11 @@ heroku ps:scale \
   release=0:Performance-L \
   train=0:Performance-L \
   --app $engine_name
+
+# Fit Spark memory usage to those dyno types
+heroku config:set \
+  PIO_SPARK_OPTS='--executor-memory 768m' \
+  PIO_TRAIN_SPARK_OPTS='--executor-memory 10g'
 ```
 
 

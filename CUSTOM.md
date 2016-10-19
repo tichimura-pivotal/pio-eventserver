@@ -1,4 +1,4 @@
-# Heroku buildpack for [PredictionIO](http://predictionio.incubator.apache.org) 0.9.5
+# Heroku buildpack for [PredictionIO](http://predictionio.incubator.apache.org)
 
 👓 Requires intermediate technical skills working with PredictionIO engines.
 
@@ -75,7 +75,7 @@ heroku pg:wait && git push heroku master
 
 Select an engine from the [gallery](https://predictionio.incubator.apache.org/gallery/template-gallery/). Download a `.tar.gz` from Github and open/expand it on your local computer.
 
-🏷 This buildpack is compatible with templates built for **PredictionIO version 0.9**
+🏷 This buildpack is compatible with templates built for **PredictionIO version 0.9 & 0.10**. The appropriate version of PredictionIO will be automatically use based on the version declared in `template.json`.
 
 🚨 Avoid engines that persist their model to the filesystem, which is incompatible with the [emphermeral filesystem](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem) of Heroku dynos. These engines must be modified to use Amazon S3 or the database for persistence. 
 
@@ -172,13 +172,18 @@ heroku restart
 
 ## Scale up
 
-Once deployed, scale up the processes to avoid memory issues:
+Once deployed, scale up the processes and config Spark to avoid memory issues:
 
 ```bash
 heroku ps:scale \
   web=1:Performance-M \
   release=0:Performance-L \
   train=0:Performance-L
+
+# Fit Spark memory usage to those dyno types
+heroku config:set \
+  PIO_SPARK_OPTS='--executor-memory 1g' \
+  PIO_TRAIN_SPARK_OPTS='--executor-memory 10g'
 ```
 
 ## Evaluation
@@ -263,16 +268,10 @@ Engine deployments honor the following config vars:
 
 ## Running commands
 
-`pio` commands that require DB access will need to have the driver specified as an argument (bug with PIO 0.9.5 + Spark 1.6.1):
-
-```bash
-pio $command -- --driver-class-path /app/lib/postgresql_jdbc.jar
-```
-
 #### To run directly with Heroku CLI
 
 ```bash
-heroku run "cd pio-engine && pio $command -- --driver-class-path /app/lib/postgresql_jdbc.jar"
+heroku run pio $command
 ```
 
 #### Useful commands
@@ -280,6 +279,14 @@ heroku run "cd pio-engine && pio $command -- --driver-class-path /app/lib/postgr
 Check engine status:
 
 ```bash
-heroku run "cd pio-engine && pio status -- --driver-class-path /app/lib/postgresql_jdbc.jar"
+heroku run pio status
+```
+
+#### Fix for database connectivity with PredictionIO 0.9.5
+
+`pio` commands that require DB access will need to have the driver specified as an argument (bug with PIO 0.9.5 + Spark 1.6.1):
+
+```bash
+pio $command -- --driver-class-path /app/lib/postgresql_jdbc.jar
 ```
 
