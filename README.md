@@ -48,9 +48,9 @@ Once deployed, how to work with the engine.
 ```bash
 git clone \
   https://github.com/heroku/predictionio-buildpack.git \
-  pio-eventserver-classification
+  pio-eventserver
 
-cd pio-eventserver-classification
+cd pio-eventserver
 
 heroku create $eventserver_name
 heroku addons:create heroku-postgresql:hobby-dev
@@ -76,9 +76,9 @@ We'll be using a [classification engine for Heroku](https://github.com/heroku/pr
 ```bash
 git clone \
   https://github.com/heroku/predictionio-engine-classification.git \
-  predictionio-engine-classification
+  pio-engine-classi
 
-cd predictionio-engine-classification
+cd pio-engine-classi
 
 heroku create $engine_name
 heroku buildpacks:add -i 1 https://github.com/heroku/heroku-buildpack-jvm-common.git
