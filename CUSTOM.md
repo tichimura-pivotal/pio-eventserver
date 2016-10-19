@@ -77,8 +77,6 @@ Select an engine from the [gallery](https://predictionio.incubator.apache.org/ga
 
 🏷 This buildpack is compatible with templates built for **PredictionIO version 0.9 & 0.10**. The appropriate version of PredictionIO will be automatically use based on the version declared in `template.json`.
 
-🚨 Avoid engines that persist their model to the filesystem, which is incompatible with the [emphermeral filesystem](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem) of Heroku dynos. These engines must be modified to use Amazon S3 or the database for persistence. 
-
 ### Create an engine
 
 `cd` into the engine's directory, and ensure it is a git repo:
@@ -94,6 +92,22 @@ heroku create $engine_name
 heroku buildpacks:add -i 1 https://github.com/heroku/heroku-buildpack-jvm-common.git
 heroku buildpacks:add -i 2 https://github.com/heroku/predictionio-buildpack.git
 ```
+
+#### Optional Persistent Filesystem
+
+👓 Heroku dynos have an [ephemeral filesystem](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
+
+For engines that require filesystem persistence, this buildpack supports [HDFS](https://en.wikipedia.org/wiki/Apache_Hadoop#HDFS) on [Amazon S3](https://aws.amazon.com/s3/).
+
+To enable, either:
+
+* use the [S3 Add-on](https://devcenter.heroku.com/articles/bucketeer) ($5/month minimum cost)
+
+  ```bash
+  heroku addons:create bucketeer --as PIO_S3
+  ```
+* bring your own [s3 bucket](https://aws.amazon.com/s3/) by manually setting the [`PIO_S3_*` config vars](#environment-variables).
+
 
 ### Create a PredictionIO app in the eventserver
 
@@ -265,6 +279,8 @@ Engine deployments honor the following config vars:
 * `PIO_TRAIN_ON_RELEASE`
   * set `false` to disable automatic training
   * subsequent deploys will crash a deployed engine until it's retrained; use [manual training](#manual-training)
+* `PIO_S3_BUCKET_NAME`, `PIO_S3_AWS_ACCESS_KEY_ID`, & `PIO_S3_AWS_SECRET_ACCESS_KEY`
+  * configures a bucket to enable filesystem access
 
 ## Running commands
 

@@ -121,6 +121,7 @@ else
   echo "Writing default 'pio-env.sh'" | indent
   cp "${default_pio_env}" "${target_pio_env}" | indent
 fi
+cp "$BP_DIR/config/core-site.xml.erb" "$dist_dir/conf/"
 
 topic "Set-up PredictionIO environment"
 mkdir -p "$BUILD_DIR/.profile.d"

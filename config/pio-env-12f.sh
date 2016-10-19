@@ -23,7 +23,7 @@ fi
 
 # HADOOP_CONF_DIR: You must configure this if you intend to run PredictionIO
 #                  with Hadoop 2.
-# HADOOP_CONF_DIR=/opt/hadoop
+HADOOP_CONF_DIR=/app/pio-engine/PredictionIO-dist/conf
 
 # HBASE_CONF_DIR: You must configure this if you intend to run PredictionIO
 #                 with HBase on a remote cluster.
