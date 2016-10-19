@@ -7,5 +7,5 @@ if [ -e "/app/.heroku/.is_old_predictionio" ]
 then
   eval "cd pio-engine/ && pio deploy --port $PORT --event-server-ip $PIO_EVENTSERVER_HOSTNAME --event-server-port $PIO_EVENTSERVER_PORT --accesskey $PIO_EVENTSERVER_ACCESS_KEY ${PIO_OPTS:-} -- --driver-class-path /app/lib/postgresql_jdbc.jar ${PIO_SPARK_OPTS:-}"
 else
-  eval "cd pio-engine/ && pio deploy --port $PORT --event-server-ip $PIO_EVENTSERVER_HOSTNAME --event-server-port $PIO_EVENTSERVER_PORT --accesskey $PIO_EVENTSERVER_ACCESS_KEY ${PIO_OPTS:-} -- ${PIO_SPARK_OPTS:-}"
+  eval "cd pio-engine/ && pio deploy --port $PORT --event-server-ip $PIO_EVENTSERVER_HOSTNAME --event-server-port $PIO_EVENTSERVER_PORT --accesskey $PIO_EVENTSERVER_ACCESS_KEY ${PIO_OPTS:-} -- --packages org.apache.hadoop:hadoop-aws:2.7.2 ${PIO_SPARK_OPTS:-}"
 fi
