@@ -26,6 +26,7 @@ Please, follow the steps in the order documented.
   1. [Deploy the eventserver](#deploy-the-eventserver)
 * [Engine](#engine)
   1. [Create an engine](#create-an-engine)
+    * [Optional Persistent Filesystem](#optional-persistent-filesystem)
   1. [Create a Heroku app for the engine](#create-a-heroku-app-for-the-engine)
   1. [Create a PredictionIO app in the eventserver](#create-a-predictionio-app-in-the-eventserver)
   1. [Configure the Heroku app to use the eventserver](#configure-the-heroku-app-to-use-the-eventserver)
@@ -93,7 +94,7 @@ heroku buildpacks:add -i 1 https://github.com/heroku/heroku-buildpack-jvm-common
 heroku buildpacks:add -i 2 https://github.com/heroku/predictionio-buildpack.git
 ```
 
-#### Optional Persistent Filesystem
+### Optional Persistent Filesystem
 
 👓 Heroku dynos have an [ephemeral filesystem](https://devcenter.heroku.com/articles/dynos#ephemeral-filesystem).
 
