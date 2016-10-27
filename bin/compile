@@ -62,10 +62,12 @@ ENV_DIR=${3:-}
 BP_DIR=$(cd $(dirname ${0:-}); cd ..; pwd)
 
 
+export_env_dir "$ENV_DIR" '^PIO_BUILD_SPARK_VERSION$'
+SPARK_VERSION="spark-${PIO_BUILD_SPARK_VERSION:-1.6.2}-bin-hadoop2.6"
+
 if [ $(requires_apache_predictionio "$BUILD_DIR/template.json") ]
 then
   PIO_VERSION=0.10.0-incubating
-  SPARK_VERSION=spark-1.6.2-bin-hadoop2.6
   # No special PostgreSQL driver is required
   POSTGRESQL_DRIVER=''
   echo "Using Apache PredictionIO ${PIO_VERSION}" | indent
@@ -73,7 +75,6 @@ else
   mkdir -p "$BUILD_DIR/.heroku"
   echo '# Presence of this file indicates a pre-Apache engine (<= 0.9)' > "$BUILD_DIR/.heroku/.is_old_predictionio"
   PIO_VERSION=0.9.5
-  SPARK_VERSION=spark-1.6.2-bin-hadoop2.6
   POSTGRESQL_DRIVER=postgresql-9.4.1209.jar
   echo "Using PredictionIO $PIO_VERSION" | indent
 fi

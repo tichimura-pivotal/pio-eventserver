@@ -253,6 +253,9 @@ $ cat best.json
 
 Engine deployments honor the following config vars:
 
+* `PIO_BUILD_SPARK_VERSION`
+  * default `1.6.2`
+  * supports `1.4.1`, `1.5.1`, `1.6.1`, & `1.6.2`
 * `PIO_OPTS`
   * options passed as `pio $opts`
   * see: [`pio` command reference](https://predictionio.incubator.apache.org/cli/)
