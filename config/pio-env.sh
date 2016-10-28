@@ -45,21 +45,48 @@ PIO_FS_TMPDIR=$PIO_FS_BASEDIR/tmp
 # https://docs.prediction.io/system/anotherdatastore/
 
 # Storage Repositories
+PIO_STORAGE_REPOSITORIES_METADATA_NAME=pio_meta
+PIO_STORAGE_REPOSITORIES_METADATA_SOURCE=PGSQL
+PIO_STORAGE_REPOSITORIES_EVENTDATA_NAME=pio_event
+PIO_STORAGE_REPOSITORIES_EVENTDATA_SOURCE=PGSQL
+PIO_STORAGE_REPOSITORIES_MODELDATA_NAME=pio_model
+PIO_STORAGE_REPOSITORIES_MODELDATA_SOURCE=PGSQL
+PIO_STORAGE_SOURCES_PGSQL_TYPE=jdbc
 
-# Default is to use PostgreSQL
-PIO_STORAGE_REPOSITORIES_METADATA_NAME="${PIO_STORAGE_REPOSITORIES_METADATA_NAME-pio_meta}"
-PIO_STORAGE_REPOSITORIES_METADATA_SOURCE="${PIO_STORAGE_REPOSITORIES_METADATA_SOURCE-PGSQL}"
+# Transform Postgres connetion URL (Heroku config var) to PIO vars.
+if [ -z "${DATABASE_URL}" ]; then
+    PIO_STORAGE_SOURCES_PGSQL_URL=jdbc:postgresql://localhost/pio
+    PIO_STORAGE_SOURCES_PGSQL_USERNAME=pio
+    PIO_STORAGE_SOURCES_PGSQL_PASSWORD=pio
+else
+    # from: http://stackoverflow.com/a/17287984/77409
+    # extract the protocol
+    proto="`echo $DATABASE_URL | grep '://' | sed -e's,^\(.*://\).*,\1,g'`"
+    # remove the protocol
+    url=`echo $DATABASE_URL | sed -e s,$proto,,g`
 
-PIO_STORAGE_REPOSITORIES_EVENTDATA_NAME="${PIO_STORAGE_REPOSITORIES_EVENTDATA_NAME-pio_event}"
-PIO_STORAGE_REPOSITORIES_EVENTDATA_SOURCE="${PIO_STORAGE_REPOSITORIES_EVENTDATA_SOURCE-PGSQL}"
+    # extract the user and password (if any)
+    userpass="`echo $url | grep @ | cut -d@ -f1`"
+    pass=`echo $userpass | grep : | cut -d: -f2`
+    if [ -n "$pass" ]; then
+        user=`echo $userpass | grep : | cut -d: -f1`
+    else
+        user=$userpass
+    fi
 
-PIO_STORAGE_REPOSITORIES_MODELDATA_NAME="${PIO_STORAGE_REPOSITORIES_MODELDATA_NAME-pio_model}"
-PIO_STORAGE_REPOSITORIES_MODELDATA_SOURCE="${PIO_STORAGE_REPOSITORIES_MODELDATA_SOURCE-PGSQL}"
+    # extract the host -- updated
+    hostport=`echo $url | sed -e s,$userpass@,,g | cut -d/ -f1`
+    port=`echo $hostport | grep : | cut -d: -f2`
+    if [ -n "$port" ]; then
+        host=`echo $hostport | grep : | cut -d: -f1`
+    else
+        host=$hostport
+    fi
 
-# Storage Data Sources
+    # extract the path (if any)
+    path="`echo $url | grep / | cut -d/ -f2-`"
 
-# PostgreSQL Default Settings
-PIO_STORAGE_SOURCES_PGSQL_TYPE="${PIO_STORAGE_SOURCES_PGSQL_TYPE-jdbc}"
-PIO_STORAGE_SOURCES_PGSQL_URL="${PIO_STORAGE_SOURCES_PGSQL_URL-jdbc:postgresql://localhost/pio}"
-PIO_STORAGE_SOURCES_PGSQL_USERNAME="${PIO_STORAGE_SOURCES_PGSQL_USERNAME-pio}"
-PIO_STORAGE_SOURCES_PGSQL_PASSWORD="${PIO_STORAGE_SOURCES_PGSQL_PASSWORD-pio}"
+    PIO_STORAGE_SOURCES_PGSQL_URL=jdbc:postgresql://$hostport/$path?sslmode=require
+    PIO_STORAGE_SOURCES_PGSQL_USERNAME=$user
+    PIO_STORAGE_SOURCES_PGSQL_PASSWORD=$pass
+fi

@@ -2,6 +2,7 @@
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
 <configuration>
+<% if ENV["PIO_S3_BUCKET_NAME"] %>
         <property>
                 <name>fs.s3n.impl</name>
                 <value>org.apache.hadoop.fs.s3native.NativeS3FileSystem</value>
@@ -19,4 +20,5 @@
                 <name>fs.s3n.awsSecretAccessKey</name>
                 <value><%= ENV["PIO_S3_AWS_SECRET_ACCESS_KEY"] %></value>
         </property>
+<% end %>
 </configuration>

@@ -232,8 +232,7 @@ Then, start the process, specifying the evaluation & engine params classes from 
 $ pio eval \
     org.template.classification.AccuracyEvaluation \
     org.template.classification.EngineParamsList  \
-    -- --driver-class-path /app/lib/postgresql_jdbc.jar \
-      --executor-memory 10g
+    -- --executor-memory 10g
 ```
 
 ### Re-deploy best parameters

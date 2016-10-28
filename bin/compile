@@ -99,7 +99,7 @@ app_namespace="pio-engine"
 app_prefix="/app/${app_namespace}"
 mkdir -p $app_prefix
 
-default_pio_env="config/pio-env-12f.sh"
+default_pio_env="config/pio-env.sh"
 custom_pio_env="$BUILD_DIR/config/pio-env.sh"
 target_pio_env="${dist_dir}/conf/pio-env.sh"
 
@@ -129,7 +129,7 @@ mkdir -p "$BUILD_DIR/.profile.d"
 cp -r .profile.d/* "$BUILD_DIR/.profile.d/" | indent
 # Load the env for the following build steps
 export_env_dir "$ENV_DIR" '^DATABASE_URL$'
-source .profile.d/pio-env.sh
+source .profile.d/pio-path.sh
 
 if [ -f "${BUILD_DIR}/engine.json" ]
 then
