@@ -153,11 +153,14 @@ heroku ps:scale \
   release=0:Performance-L \
   train=0:Performance-L \
   --app $engine_name
+```
 
-# Fit Spark memory usage to those dyno types
+Fit Spark memory usage to the [dyno types' RAM](https://devcenter.heroku.com/articles/dyno-types#available-dyno-types)
+
+```bash
 heroku config:set \
-  PIO_SPARK_OPTS='--executor-memory 768m' \
-  PIO_TRAIN_SPARK_OPTS='--executor-memory 10g'
+  PIO_SPARK_OPTS='--executor-memory 512m --driver-memory 512m' \
+  PIO_TRAIN_SPARK_OPTS='--executor-memory 10g --driver-memory 4g'
 ```
 
 

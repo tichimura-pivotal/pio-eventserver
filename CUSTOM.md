@@ -187,18 +187,21 @@ heroku restart
 
 ## Scale up
 
-Once deployed, scale up the processes and config Spark to avoid memory issues:
+Once deployed, scale up the processes and config Spark to avoid memory issues. These are paid, [professional dyno types](https://devcenter.heroku.com/articles/dyno-types#available-dyno-types):
 
 ```bash
 heroku ps:scale \
   web=1:Performance-M \
   release=0:Performance-L \
   train=0:Performance-L
+```
 
-# Fit Spark memory usage to those dyno types
+Fit Spark memory usage to the [dyno types' RAM](https://devcenter.heroku.com/articles/dyno-types#available-dyno-types)
+
+```bash
 heroku config:set \
-  PIO_SPARK_OPTS='--executor-memory 1g' \
-  PIO_TRAIN_SPARK_OPTS='--executor-memory 10g'
+  PIO_SPARK_OPTS='--executor-memory 1536m --driver-memory 1g' \
+  PIO_TRAIN_SPARK_OPTS='--executor-memory 10g --driver-memory 4g'
 ```
 
 ## Evaluation
@@ -219,7 +222,7 @@ DataSourceParams(appName = sys.env("PIO_EVENTSERVER_APP_NAME"), evalK = Some(5))
 
 ### Perform evaluation
 
-Next, start a console & change to the engine's directory:
+Next, start a console & change to the engine's directory. This uses a paid, [professional dyno type](https://devcenter.heroku.com/articles/dyno-types#available-dyno-types):
 
 ```bash
 heroku run bash --size Performance-L
@@ -232,8 +235,10 @@ Then, start the process, specifying the evaluation & engine params classes from 
 $ pio eval \
     org.template.classification.AccuracyEvaluation \
     org.template.classification.EngineParamsList  \
-    -- --executor-memory 10g
+    -- --executor-memory 10g --driver-memory 4g
 ```
+
+Note that we fit memory parameters to the [dyno type's RAM](https://devcenter.heroku.com/articles/dyno-types#available-dyno-types).
 
 ### Re-deploy best parameters
 
@@ -270,8 +275,8 @@ Engine deployments honor the following config vars:
 
     ```bash
     heroku config:set \
-      PIO_SPARK_OPTS='--executor-memory 1g' \
-      PIO_TRAIN_SPARK_OPTS='--executor-memory 10g'
+      PIO_SPARK_OPTS='--executor-memory 1536m --driver-memory 1g' \
+      PIO_TRAIN_SPARK_OPTS='--executor-memory 10g --driver-memory 4g'
     ```
 * `PIO_EVENTSERVER_HOSTNAME`
   * `$eventserver_name.herokuapp.com`
