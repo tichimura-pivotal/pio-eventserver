@@ -196,14 +196,6 @@ heroku ps:scale \
   train=0:Performance-L
 ```
 
-Fit Spark memory usage to the [dyno types' RAM](https://devcenter.heroku.com/articles/dyno-types#available-dyno-types)
-
-```bash
-heroku config:set \
-  PIO_SPARK_OPTS='--executor-memory 1536m --driver-memory 1g' \
-  PIO_TRAIN_SPARK_OPTS='--executor-memory 10g --driver-memory 4g'
-```
-
 ## Evaluation
 
 PredictionIO provides an [Evaluation mode for engines](https://predictionio.incubator.apache.org/evaluation/), which uses cross-validation to help select optimum engine parameters.
@@ -238,7 +230,7 @@ $ pio eval \
     -- --executor-memory 10g --driver-memory 4g
 ```
 
-Note that we fit memory parameters to the [dyno type's RAM](https://devcenter.heroku.com/articles/dyno-types#available-dyno-types).
+✏️ Memory parameters are set to fit the [dyno `--size`](https://devcenter.heroku.com/articles/dyno-types#available-dyno-types) set in the `heroku run` command.
 
 ### Re-deploy best parameters
 
@@ -271,7 +263,7 @@ Engine deployments honor the following config vars:
 * `PIO_SPARK_OPTS` & `PIO_TRAIN_SPARK_OPTS`
   * **deploy** & **training** options passed through to `spark-submit $opts`
   * see: [`spark-submit` reference](http://spark.apache.org/docs/1.6.1/submitting-applications.html)
-  * example:
+  * example, overriding the default Spark memory settings:
 
     ```bash
     heroku config:set \
