@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 
-erb /app/pio-engine/PredictionIO-dist/conf/core-site.xml.erb > /app/pio-engine/PredictionIO-dist/conf/core-site.xml
+core_site_template=/app/pio-engine/PredictionIO-dist/conf/core-site.xml.erb
+
+if [ -f "$core_site_template" ]
+then
+  erb $core_site_template > /app/pio-engine/PredictionIO-dist/conf/core-site.xml
+fi
