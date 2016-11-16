@@ -227,7 +227,7 @@ Then, start the process, specifying the evaluation & engine params classes from 
 $ pio eval \
     org.template.classification.AccuracyEvaluation \
     org.template.classification.EngineParamsList  \
-    -- --executor-memory 10g --driver-memory 4g
+    -- $PIO_SPARK_OPTS
 ```
 
 ✏️ Memory parameters are set to fit the [dyno `--size`](https://devcenter.heroku.com/articles/dyno-types#available-dyno-types) set in the `heroku run` command.
@@ -263,7 +263,7 @@ Engine deployments honor the following config vars:
 * `PIO_SPARK_OPTS` & `PIO_TRAIN_SPARK_OPTS`
   * **deploy** & **training** options passed through to `spark-submit $opts`
   * see: [`spark-submit` reference](http://spark.apache.org/docs/1.6.1/submitting-applications.html)
-  * example, overriding the default Spark memory settings:
+  * example, overriding the automatic (fit-to-dyno) Spark memory settings:
 
     ```bash
     heroku config:set \
