@@ -69,7 +69,9 @@ heroku pg:wait && git push heroku master
 
 ## 3. Classification Engine
 
-We'll be using a [classification engine for Heroku](https://github.com/heroku/predictionio-engine-classification) which implements [Apache Spark MLlib's Naive Bayes algorithm](https://spark.apache.org/docs/1.6.2/mllib-naive-bayes.html) to predict a label from a set of attributes. See the [Classification Quickstart](http://predictionio.incubator.apache.org/templates/classification/quickstart/) for more about this engine.
+Decision trees We'll be using a [classification engine for Heroku](https://github.com/heroku/predictionio-engine-classification) which implements [Spark's Random Forests algorithm](https://spark.apache.org/docs/1.6.2/mllib-ensembles.html) to predict a label using decision trees. See [A Visual Introduction to Machine Learning](http://www.r2d3.us/visual-intro-to-machine-learning-part-1/) to learn how decision trees are so effective.
+
+Originally this engine implemented [Spark's Naive Bayes algorithm](https://spark.apache.org/docs/1.6.2/mllib-naive-bayes.html). We soon switched to Random Forests to improved results by correlating attributes, a well-known weakness of Naive Bayes. The Bayes algorithm is still available in the engine source.
 
 ### Create the engine
 
@@ -159,9 +161,14 @@ heroku ps:scale \
 
 Once deployment completes, the engine is ready to predict the best fitting **service plan** for a **mobile phone user** based on their **voice, data, and text usage**.
 
-Submit queries containing these three user attributes to get predictions using [Apache Spark MLlib's Naive Bayes algorithm](https://spark.apache.org/docs/1.6.2/mllib-naive-bayes.html):
+Submit queries containing these three user attributes to get predictions using [Spark's Random Forests algorithm](https://spark.apache.org/docs/1.6.2/mllib-ensembles.html):
 
 ```bash
+# Fits low usage, `0`
+curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
+     -H "Content-Type: application/json; charset=utf-8" \
+     -d "{\"voice_usage\":12,\"data_usage\":0,\"text_usage\":4}"
+
 # Fits more voice, `1`
 curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
      -H "Content-Type: application/json; charset=utf-8" \
@@ -176,11 +183,29 @@ curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
 curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
      -H "Content-Type: application/json; charset=utf-8" \
      -d "{\"voice_usage\":5,\"data_usage\":80,\"text_usage\":1000}"
+
+#Extreme voice & data, `4`
+curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
+     -H "Content-Type: application/json; charset=utf-8" \
+     -d "{\"voice_usage\":450,\"data_usage\":1104,\"text_usage\":43}"
+
+#Extreme data & text, `5`
+curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
+     -H "Content-Type: application/json; charset=utf-8" \
+     -d "{\"voice_usage\":24,\"data_usage\":770,\"text_usage\":482}"
+
+#Extreme voice & text, `6`
+curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
+     -H "Content-Type: application/json; charset=utf-8" \
+     -d "{\"voice_usage\":450,\"data_usage\":80,\"text_usage\":332}"
+
+#Everything equal / balanced usage, `7`
+curl -X "POST" "https://$engine_name.herokuapp.com/queries.json" \
+     -H "Content-Type: application/json; charset=utf-8" \
+     -d "{\"voice_usage\":450,\"data_usage\":432,\"text_usage\":390}"
 ```
 
-This model is simplified for demonstration. For a real-world model more aspects of a user account and their correlations might be taken into consideration, including: account type (individual, business, or family), frequency of roaming, international usage, device type (smart phone or feature phone), age of device, etc.
-
-See [usage details for this classification engine](http://predictionio.incubator.apache.org/templates/classification/quickstart/#6.-use-the-engine) in the PredictionIO docs.
+For a production model, more aspects of a user account and their correlations might be taken into consideration, including: account type (individual, business, or family), frequency of roaming, international usage, device type (smart phone or feature phone), age of device, etc.
 
 
 ## Diagnostics
@@ -200,9 +225,7 @@ heroku restart --app $engine_name
 
 # Going Deeper 🔬
 
-This is a demo application of PredictionIO, already customized for the smoothest experience possible.
+This is a sample application of PredictionIO, preset to get up-and-running quickly.
 
-**Custom PredictionIO engines** may be deployed with this buildpack too. See [CUSTOM documentation](CUSTOM.md).
-
-More details including [training](CUSTOM.md#training), [evaluation](CUSTOM.md#evaluation), & [configuration](CUSTOM.md#configuration) are explained there to.
+**Custom PredictionIO engines** may be deployed with this buildpack too. See [CUSTOM documentation](CUSTOM.md) including: [training](CUSTOM.md#training), [evaluation](CUSTOM.md#evaluation), & [configuration](CUSTOM.md#configuration).
 
