@@ -69,9 +69,9 @@ heroku pg:wait && git push heroku master
 
 ## 3. Classification Engine
 
-Decision trees We'll be using a [classification engine for Heroku](https://github.com/heroku/predictionio-engine-classification) which implements [Spark's Random Forests algorithm](https://spark.apache.org/docs/1.6.2/mllib-ensembles.html) to predict a label using decision trees. See [A Visual Introduction to Machine Learning](http://www.r2d3.us/visual-intro-to-machine-learning-part-1/) to learn how decision trees are so effective.
+We'll be using a [classification engine for Heroku](https://github.com/heroku/predictionio-engine-classification) which implements [Spark's Random Forests algorithm](https://spark.apache.org/docs/1.6.2/mllib-ensembles.html) to predict a label using decision trees. See [A Visual Introduction to Machine Learning](http://www.r2d3.us/visual-intro-to-machine-learning-part-1/) to learn why decision trees are so effective.
 
-Originally this engine implemented [Spark's Naive Bayes algorithm](https://spark.apache.org/docs/1.6.2/mllib-naive-bayes.html). We soon switched to Random Forests to improved results by correlating attributes, a well-known weakness of Naive Bayes. The Bayes algorithm is still available in the engine source.
+(Originally this engine implemented [Spark's Naive Bayes algorithm](https://spark.apache.org/docs/1.6.2/mllib-naive-bayes.html). We soon switched to Random Forests to improved results by correlating attributes, a well-known weakness of Naive Bayes. The Bayes algorithm is still available in the engine source.)
 
 ### Create the engine
 
