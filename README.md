@@ -1,5 +1,7 @@
 # PredictionIO classification app
 
+This is cloned from PredictionIO to be used for cloudfoundry as buildpack
+
 Predictive classification powered by [PredictionIO](https://predictionio.incubator.apache.org), machine learning on [Heroku](http://www.heroku.com).
 
 This is a demo application of PredictionIO preset for simplified deployment. **Custom PredictionIO engines** may be deployed as well, see [CUSTOM documentation](CUSTOM.md).

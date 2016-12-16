@@ -10,8 +10,9 @@
 # SPARK_HOME: Apache Spark is a hard dependency and must be configured.
 # Must match $spark_dist_dir in bin.compile
 SPARK_HOME=/app/pio-engine/PredictionIO-dist/vendors/spark-hadoop
-SPARK_LOCAL_IP="${HEROKU_PRIVATE_IP:-}"
-SPARK_PUBLIC_DNS="${HEROKU_DNS_DYNO_NAME:-}"
+SPARK_LOCAL_IP="${CF_INSTANCE_IP:-}"
+#SPARK_PUBLIC_DNS="${HEROKU_DNS_DYNO_NAME:-}"
+SPARK_PUBLIC_DNS="cfapps.io"
 
 
 if [ -e "/app/.heroku/.is_old_predictionio" ]
@@ -53,6 +54,10 @@ PIO_STORAGE_REPOSITORIES_MODELDATA_NAME=pio_model
 PIO_STORAGE_REPOSITORIES_MODELDATA_SOURCE=PGSQL
 PIO_STORAGE_SOURCES_PGSQL_TYPE=jdbc
 
+echo $VCAP_SERVICES "is vcap service-------, and postgres should be there "
+export DATABASE_URL=`echo $VCAP_SERVICES | jq -r '.elephantsql[0].credentials.uri'`
+echo $DATABASE_URL "is database url-------, and postgres should be there "
+
 # Transform Postgres connetion URL (Heroku config var) to PIO vars.
 if [ -z "${DATABASE_URL}" ]; then
     PIO_STORAGE_SOURCES_PGSQL_URL=jdbc:postgresql://localhost/pio
@@ -86,7 +91,15 @@ else
     # extract the path (if any)
     path="`echo $url | grep / | cut -d/ -f2-`"
 
-    PIO_STORAGE_SOURCES_PGSQL_URL=jdbc:postgresql://$hostport/$path?sslmode=require
+    echo $CF_INSTANCE_IP "is CF_INSTANCE_IP"
+    echo $url " is url"
+    echo $path " is path"
+
+    #PIO_STORAGE_SOURCES_PGSQL_URL=jdbc:postgresql://$hostport/$path?sslmode=require
+    PIO_STORAGE_SOURCES_PGSQL_URL=jdbc:postgresql://$hostport/$path
+    echo $PIO_STORAGE_SOURCES_PGSQL_URL "is PIO_STORAGE_SOURCES_PGSQL_URL"
     PIO_STORAGE_SOURCES_PGSQL_USERNAME=$user
+    echo $PIO_STORAGE_SOURCES_PGSQL_USERNAME "is PIO_STORAGE_SOURCES_PGSQL_USERNAME"
     PIO_STORAGE_SOURCES_PGSQL_PASSWORD=$pass
+    echo $PIO_STORAGE_SOURCES_PGSQL_PASSWORD "is PIO_STORAGE_SOURCES_PGSQL_PASSWORD"
 fi
