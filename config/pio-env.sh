@@ -10,8 +10,8 @@
 # SPARK_HOME: Apache Spark is a hard dependency and must be configured.
 # Must match $spark_dist_dir in bin.compile
 SPARK_HOME=/app/pio-engine/PredictionIO-dist/vendors/spark-hadoop
-#SPARK_LOCAL_IP="${CF_INSTANCE_IP:-}"
-SPARK_LOCAL_IP="localhost"
+SPARK_LOCAL_IP="${CF_INSTANCE_IP:-}"
+#SPARK_LOCAL_IP="localhost"
 #SPARK_PUBLIC_DNS="${HEROKU_DNS_DYNO_NAME:-}"
 SPARK_PUBLIC_DNS="cfapps.io"
 
