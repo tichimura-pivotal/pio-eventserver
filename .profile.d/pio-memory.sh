@@ -28,7 +28,8 @@ case $limit in
   default_spark_opts="--executor-memory 10g --driver-memory 4g"
   ;;
 *)
-  default_spark_opts="--executor-memory 256m --driver-memory 256m"
+#  default_spark_opts="--executor-memory 256m --driver-memory 256m"
+  default_spark_opts="--executor-memory 4g --driver-memory 4g"
   ;;
 esac
 
