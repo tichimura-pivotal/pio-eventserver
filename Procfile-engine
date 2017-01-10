@@ -1,4 +1,4 @@
-web: bin/heroku-buildpack-pio-train
+web: bin/heroku-buildpack-pio-train && bin/heroku-buildpack-pio-web
 #train: bin/heroku-buildpack-pio-train
 #release: bin/heroku-buildpack-pio-release
 #web: bin/heroku-buildpack-pio-web
